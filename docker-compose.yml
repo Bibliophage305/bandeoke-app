@@ -9,6 +9,7 @@ services:
       - "24678:24678"
     volumes:
       - ./public:/home/node/app/public
+      - ./database:/home/node/app/database
       - ./middleware:/home/node/app/middleware
       - ./server:/home/node/app/server
       - ./plugins:/home/node/app/plugins

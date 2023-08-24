@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 
 export default defineEventHandler(async (event) => {
   const id = parseInt(getRouterParam(event, "id"));
-  const filename = path.join(process.cwd(), "static", "database", `${id}.json`)
+  const filename = path.join(process.cwd(), "database", `${id}.json`)
   const signup = JSON.parse(
     fs.readFileSync(filename)
   );

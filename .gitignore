@@ -11,6 +11,7 @@ node_modules
 # Logs
 logs
 *.log
+.npmrc
 
 # Misc
 .DS_Store
@@ -23,4 +24,4 @@ logs
 !.env.example
 
 # booky "database"
-/static/database/*
+/database/*

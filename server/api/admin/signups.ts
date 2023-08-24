@@ -4,11 +4,11 @@ import * as fs from "node:fs";
 export default defineEventHandler(async (event) => {
   const songs = await $fetch("/api/songs");
   const filenames = fs.readdirSync(
-    path.join(process.cwd(), "static", "database")
+    path.join(process.cwd(), "database")
   );
   const signups = filenames.map((filename) => {
     let signup = JSON.parse(
-      fs.readFileSync(path.join(process.cwd(), "static", "database", filename))
+      fs.readFileSync(path.join(process.cwd(), "database", filename))
     );
     signup.song = songs.find((song) => song.id == signup.song_id);
     signup.timestamp = path.parse(filename).name;
