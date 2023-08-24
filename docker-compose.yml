@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  nuxt:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "5173:5173"
+      - "24678:24678"
+    volumes:
+      - ./public:/home/node/app/public
+      - ./middleware:/home/node/app/middleware
+      - ./server:/home/node/app/server
+      - ./plugins:/home/node/app/plugins
+      - ./static:/home/node/app/static
+      - ./pages:/home/node/app/pages
+      - ./nuxt.config.ts:/home/node/app/nuxt.config.ts
+      - ./tsconfig.json:/home/node/app/tsconfig.json
+    command: yarn dev --host 0.0.0.0
+    environment:
+      - PORT=5173
