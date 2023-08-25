@@ -1,5 +1,13 @@
 FROM node:18-alpine
-RUN mkdir -p /home/node/app
-WORKDIR /home/node/app
-COPY package.json yarn.lock ./
-RUN yarn
+
+COPY .output /
+COPY static /static
+
+EXPOSE 3000
+
+WORKDIR /
+
+ENV NUXT_HOST=0.0.0.0
+ENV NUXT_PORT=3000
+
+CMD ["node", "/server/index.mjs"]

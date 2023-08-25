@@ -3,7 +3,7 @@ services:
   nuxt:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: dockerfile.dev
     ports:
       - "5173:5173"
       - "24678:24678"
