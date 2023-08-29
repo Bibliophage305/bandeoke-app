@@ -10,11 +10,13 @@ const { data } = await useFetch("/api/songs");
 const tableHeaders = [
   { title: "Title", key: "title" },
   { title: "Artist", key: "artist" },
-  { title: "Categories", key: "genres", sortable: false },
+  { title: "Categories", key: "categories", sortable: false },
 ];
 
 const search = ref("");
 const expanded = ref([]);
+const categoryFilters = ref([]);
+const categoryFilterOptions = [...new Set(data.value.map(song => song.categories).flat(1))].sort();
 
 const expandRow = (item, event) => {
   if (expanded.value.includes(event.item.key)) {
@@ -31,7 +33,7 @@ const expandRow = (item, event) => {
       <v-row justify="center" class="text-center">
         <h1>Sign up to sing a song with The Fever!</h1>
       </v-row>
-      <v-row justify="center" class="text-center">
+      <v-row justify="center" class="text-center pb-3">
         <h2>Tap your song to get started</h2>
       </v-row>
       <v-row>
@@ -39,21 +41,36 @@ const expandRow = (item, event) => {
           @click:row="expandRow"
           v-model:expanded="expanded"
           :headers="tableHeaders"
-          :items="data"
+          :items="data.filter(song => categoryFilters.every(filter => song.categories.includes(filter)))"
           :search="search"
         >
           <template v-slot:top>
-            <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-            />
+            <v-row>
+              <v-col cols="12" lg="6">
+                <v-text-field
+                  v-model="search"
+                  append-inner-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="12" lg="6">
+                <v-select
+                  chips
+                  closable-chips
+                  clearable
+                  multiple
+                  label="Category Filters"
+                  :items="categoryFilterOptions"
+                  v-model="categoryFilters"
+                />
+              </v-col>
+            </v-row>
           </template>
-          <template v-slot:item.genres="{ item }">
-            <v-chip v-for="genre in item.columns.genres">
-              {{ genre }}
+          <template v-slot:item.categories="{ item }">
+            <v-chip v-for="category in item.columns.categories" @click="categoryFilters.indexOf(category) === -1 && categoryFilters.push(category)">
+              {{ category }}
             </v-chip>
           </template>
           <template v-slot:expanded-row="{ columns, item }">
