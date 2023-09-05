@@ -1,5 +1,5 @@
-import { signupModel } from "../../../utils/schema";
-import { dbClient } from "../../../utils/dbClient";
+import { signupModel } from "~/server/utils/schema";
+import { dbClient } from "~/server/utils/dbClient";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 

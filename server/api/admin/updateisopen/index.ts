@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { settingsModel } from "../../../utils/schema";
-import { dbClient } from "../../../utils/dbClient";
+import { settingsModel } from "~/server/utils/schema";
+import { dbClient } from "~/server/utils/dbClient";
 import { drizzle } from "drizzle-orm/postgres-js";
 
 export default defineEventHandler(async (event) => {
