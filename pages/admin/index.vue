@@ -8,11 +8,9 @@ const { data: signupOpen, refresh: refreshSignupOpen } = await useFetch(
   "/api/signup/isopen"
 );
 
-const dummySwitchVariable = ref(signupOpen.value);
-
 const relativeTime = (t) => {
   const rtf = new Intl.RelativeTimeFormat("en", { style: "short" });
-  const deltaSeconds = Math.round((t - Date.now()) / 1000);
+  const deltaSeconds = Math.round((new Date(t) - Date.now()) / 1000);
 
   const cutoffs = [
     60,
@@ -33,33 +31,23 @@ const relativeTime = (t) => {
   return rtf.format(Math.floor(deltaSeconds / divisor), units[unitIndex]);
 };
 
-const dismiss = async (timestamp) => {
-  await useFetch(`/api/admin/dismiss/${timestamp}`, {
+const updateToDo = async (id, to_do) => {
+  await useFetch(`/api/admin/updatetodo`, {
     method: "post",
+    body: {
+      id,
+      to_do
+    },
     async onResponse({ request, response, options }) {
       if (response.ok) {
         const signupIndex = data.value.findIndex(
-          (signup) => signup.timestamp == timestamp
+          (signup) => signup.id == id
         );
-        data.value[signupIndex].toDo = false;
+        data.value[signupIndex].to_do = to_do;
       }
     },
   });
-};
-
-const undismiss = async (timestamp) => {
-  await useFetch(`/api/admin/undismiss/${timestamp}`, {
-    method: "post",
-    async onResponse({ request, response, options }) {
-      if (response.ok) {
-        const signupIndex = data.value.findIndex(
-          (signup) => signup.timestamp == timestamp
-        );
-        data.value[signupIndex].toDo = true;
-      }
-    },
-  });
-};
+}
 
 const toggleSignupIsOpen = async () => {
   await useFetch(`/api/admin/updateisopen`, {
@@ -105,15 +93,15 @@ const toggleSignupIsOpen = async () => {
           </thead>
           <tbody>
             <tr
-              v-for="signup in data.filter((signup) => signup.toDo)"
-              :key="signup.timestamp"
+              v-for="signup in data.filter((signup) => signup.to_do)"
+              :key="signup.created_at"
             >
               <td>{{ signup.name }}</td>
-              <td>{{ relativeTime(signup.timestamp) }}</td>
+              <td>{{ relativeTime(signup.created_at) }}</td>
               <td>{{ signup.song.title }}</td>
               <td>{{ signup.song.artist }}</td>
               <td>
-                <v-btn color="blue" @click="dismiss(signup.timestamp)"
+                <v-btn color="blue" @click="updateToDo(signup.id, false)"
                   >Dismiss</v-btn
                 >
               </td>
@@ -137,15 +125,15 @@ const toggleSignupIsOpen = async () => {
           </thead>
           <tbody>
             <tr
-              v-for="signup in data.filter((signup) => !signup.toDo)"
-              :key="signup.timestamp"
+              v-for="signup in data.filter((signup) => !signup.to_do)"
+              :key="signup.created_at"
             >
               <td>{{ signup.name }}</td>
-              <td>{{ relativeTime(signup.timestamp) }}</td>
+              <td>{{ relativeTime(signup.created_at) }}</td>
               <td>{{ signup.song.title }}</td>
               <td>{{ signup.song.artist }}</td>
               <td>
-                <v-btn color="blue" @click="undismiss(signup.timestamp)"
+                <v-btn color="blue" @click="updateToDo(signup.id, true)"
                   >Un-Dismiss</v-btn
                 >
               </td>

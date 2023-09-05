@@ -1,6 +1,6 @@
 import songs from "~/static/songManifest.json";
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   songs.sort((a, b) => {
     let textA = a.title.toUpperCase();
     let textB = b.title.toUpperCase();

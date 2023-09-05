@@ -1,12 +1,15 @@
-import * as path from "node:path";
-import * as fs from "node:fs";
+import { eq } from "drizzle-orm";
+import { settingsModel } from "../../../utils/schema";
+import { dbClient } from "../../../utils/dbClient";
+import { drizzle } from "drizzle-orm/postgres-js";
 
 export default defineEventHandler(async (event) => {
-  const filename = path.join(process.cwd(), "static", "signupOpen.json")
+  const db = drizzle(dbClient);
   const body = await readBody(event);
   const newStatus = body.status;
-  fs.writeFileSync(filename, JSON.stringify({
-      signupOpen: newStatus
-  }));
+  const response = await db
+    .update(settingsModel)
+    .set({ value: newStatus })
+    .where(eq(settingsModel.name, "signup_is_open"));
   return newStatus;
 });

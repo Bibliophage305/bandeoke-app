@@ -6,16 +6,22 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "makemigrations": "drizzle-kit generate:pg --out database/migrations --schema=./server/utils/schema.ts"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@types/node": "^18.17.1",
+    "@types/pg": "^8.10.2",
+    "drizzle-kit": "^0.19.13",
     "nuxt": "^3.6.5",
     "typescript": "^5.1.6"
   },
   "dependencies": {
     "@mdi/font": "^7.2.96",
+    "drizzle-orm": "^0.28.5",
+    "pg": "^8.11.3",
+    "postgres": "^3.3.5",
     "sass": "^1.64.2",
     "vuetify": "^3.3.11"
   }

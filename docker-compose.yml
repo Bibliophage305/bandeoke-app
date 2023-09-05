@@ -1,9 +1,36 @@
 version: "3.8"
 services:
+  postgres:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - bandeoke-postgres:/var/lib/postgresql/data
+  
+  postgres-setup:
+    image: postgres:14.1-alpine
+    restart: no
+    depends_on:
+      - postgres
+    entrypoint: [ "bash", "-c", "sleep 10 && /home/database/migrate_and_seed.sh"]      
+    volumes: 
+      - bandeoke-postgres:/var/lib/postgresql/data
+      - ./database:/home/database
+
   nuxt:
+    depends_on:
+      - postgres
+      - postgres-setup
+    links:
+      - postgres
     build:
       context: .
       dockerfile: dockerfile.dev
+    restart: always
     ports:
       - "5173:5173"
       - "24678:24678"
@@ -17,7 +44,18 @@ services:
       - ./pages:/home/node/app/pages
       - ./nuxt.config.ts:/home/node/app/nuxt.config.ts
       - ./tsconfig.json:/home/node/app/tsconfig.json
-    command: yarn dev --host 0.0.0.0
+    command: >
+      sh -c "yarn makemigrations
+      && yarn dev --host 0.0.0.0"
     environment:
       - PORT=5173
       - PASSWORD=password
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=postgres
+
+volumes:
+  bandeoke-postgres:
+    driver: local
