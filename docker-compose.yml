@@ -42,6 +42,7 @@ services:
       - ./plugins:/home/node/app/plugins
       - ./static:/home/node/app/static
       - ./pages:/home/node/app/pages
+      - ./layouts:/home/node/app/layouts
       - ./nuxt.config.ts:/home/node/app/nuxt.config.ts
       - ./tsconfig.json:/home/node/app/tsconfig.json
     command: >
