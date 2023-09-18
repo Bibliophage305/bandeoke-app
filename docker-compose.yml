@@ -16,7 +16,7 @@ services:
     restart: no
     depends_on:
       - postgres
-    entrypoint: [ "bash", "-c", "sleep 10 && /home/database/migrate_and_seed.sh"]      
+    entrypoint: [ "bash", "-c", "sleep 10 && /home/database/migrate_and_seed.sh"]
     volumes: 
       - bandeoke-postgres:/var/lib/postgresql/data
       - ./database:/home/database
@@ -45,8 +45,7 @@ services:
       - ./nuxt.config.ts:/home/node/app/nuxt.config.ts
       - ./tsconfig.json:/home/node/app/tsconfig.json
     command: >
-      sh -c "yarn makemigrations
-      && yarn dev --host 0.0.0.0"
+      sh -c "yarn dev --host 0.0.0.0"
     environment:
       - PORT=5173
       - PASSWORD=password
