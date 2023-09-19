@@ -8,6 +8,23 @@ const { data: signupOpen, refresh: refreshSignupOpen } = await useFetch(
   "/api/signup/isopen"
 );
 
+const { data: categories } = await useFetch("/api/songs/categories");
+
+const { data: hiddenCategories, refresh: refreshHiddenCategories } =
+  await useFetch("/api/admin/hiddencategories");
+
+const { data: songs } = await useFetch("/api/songs/all");
+
+const { data: hiddenSongs, refresh: refreshHiddenSongs } = await useFetch(
+  "/api/admin/hiddensongs"
+);
+
+const filterSongs = (itemTitle, queryText, item) => {
+  const itemTokens = (item.raw.title+" "+item.raw.artist).toLocaleLowerCase().replace(/[^A-Za-z0-9\s]/g, "").split(" ");
+  const queryTokens = queryText.toLocaleLowerCase().replace(/[^A-Za-z0-9\s]/g, "").split(" ");
+  return queryTokens.every(queryToken => itemTokens.some(itemToken => itemToken.includes(queryToken)));
+};
+
 const clearDismissedDialog = ref(false);
 
 const updateSignupIsOpen = async () => {
@@ -30,6 +47,30 @@ const clearDismissedSignups = async () => {
     },
   });
 };
+
+const updateHiddenCategories = async () => {
+  await useFetch(`/api/admin/updatehiddencategories`, {
+    method: "post",
+    body: {
+      categories: hiddenCategories.value,
+    },
+    async onResponse({ request, response, options }) {
+      await refreshHiddenCategories();
+    },
+  });
+};
+
+const updateHiddenSongs = async () => {
+  await useFetch(`/api/admin/updatehiddensongs`, {
+    method: "post",
+    body: {
+      songs: hiddenSongs.value,
+    },
+    async onResponse({ request, response, options }) {
+      await refreshHiddenSongs();
+    },
+  });
+};
 </script>
 
 <template>
@@ -37,7 +78,7 @@ const clearDismissedSignups = async () => {
     <v-row justify="center" class="my-5 text-center">
       <h1>Settings</h1>
     </v-row>
-    <v-row justify="center" align="center" class="my-5">
+    <v-row justify="center" align="center" class="my-5 text-center">
       <v-col cols="auto">
         <v-switch
           v-model="signupOpen"
@@ -72,6 +113,45 @@ const clearDismissedSignups = async () => {
             </v-card>
           </template>
         </v-dialog>
+      </v-col>
+    </v-row>
+    <v-row justify="center" align="center" class="my-5">
+      <v-col cols="12" lg="6">
+        <v-select
+          chips
+          closable-chips
+          clearable
+          persistent-clear
+          multiple
+          label="Hide Categories"
+          :items="categories"
+          v-model="hiddenCategories"
+          @update:model-value="updateHiddenCategories()"
+        />
+      </v-col>
+    </v-row>
+    <v-row justify="center" align="center" class="my-5">
+      <v-col cols="12" lg="6">
+        <v-autocomplete
+          chips
+          closable-chips
+          clearable
+          persistent-clear
+          multiple
+          label="Hide Songs"
+          :items="songs"
+          :custom-filter="filterSongs"
+          item-value="id"
+          v-model="hiddenSongs"
+          @update:model-value="updateHiddenSongs()"
+        >
+          <template v-slot:item="{ props, item }">
+            <v-list-item
+              v-bind="props"
+              :title="`${item.raw.title} - ${item.raw.artist}`"
+            />
+          </template>
+        </v-autocomplete>
       </v-col>
     </v-row>
   </v-container>

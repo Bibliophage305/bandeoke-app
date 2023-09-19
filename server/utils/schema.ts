@@ -13,3 +13,13 @@ export const signupModel = pgTable("signups", {
   created_at: timestamp("created_at").defaultNow(),
   to_do: boolean("to_do").default(true),
 });
+
+export const hiddenCategoryModel = pgTable("hidden_categories", {
+  id: serial("id").primaryKey(),
+  category: text("category").unique().notNull(),
+});
+
+export const hiddenSongModel = pgTable("hidden_songs", {
+  id: serial("id").primaryKey(),
+  song_id: text("song_id").unique().notNull(),
+});
