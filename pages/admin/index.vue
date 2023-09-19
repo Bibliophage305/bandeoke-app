@@ -4,7 +4,7 @@ definePageMeta({
   layout: "admin",
 });
 
-const { data } = await useFetch("/api/admin/signups");
+const { data, refresh } = await useFetch("/api/admin/signups");
 
 const relativeTime = (t) => {
   const rtf = new Intl.RelativeTimeFormat("en", { style: "short" });
@@ -44,7 +44,6 @@ const updateToDo = async (id, to_do) => {
     },
   });
 };
-
 </script>
 
 <template>
@@ -53,10 +52,15 @@ const updateToDo = async (id, to_do) => {
       <h1>The Fever bandeoke admin interface</h1>
     </v-row>
     <v-row justify="center" class="my-5">
-      <h2>To Do</h2>
+      <v-col cols="auto">
+        <h2>To Do</h2>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn color="blue" @click="refresh()">refresh</v-btn>
+      </v-col>
     </v-row>
     <v-row justify="center">
-      <v-table>
+      <v-table v-if="data.filter((signup) => signup.to_do).length > 0">
         <thead>
           <tr>
             <th class="text-left">Name</th>
@@ -83,38 +87,41 @@ const updateToDo = async (id, to_do) => {
           </tr>
         </tbody>
       </v-table>
+      <h3 class="mb-5" v-else>No new signups</h3>
     </v-row>
-    <v-row justify="center" class="my-5">
-      <h2>Done</h2>
-    </v-row>
-    <v-row justify="center">
-      <v-table>
-        <thead>
-          <tr>
-            <th class="text-left">Name</th>
-            <th class="text-left">Time</th>
-            <th class="text-left">Title</th>
-            <th class="text-left">Artist</th>
-            <th class="text-left">Un-Dismiss</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="signup in data.filter((signup) => !signup.to_do)"
-            :key="signup.created_at"
-          >
-            <td>{{ signup.name }}</td>
-            <td>{{ relativeTime(signup.created_at) }}</td>
-            <td>{{ signup.song.title }}</td>
-            <td>{{ signup.song.artist }}</td>
-            <td>
-              <v-btn color="blue" @click="updateToDo(signup.id, true)"
-                >Un-Dismiss</v-btn
-              >
-            </td>
-          </tr>
-        </tbody>
-      </v-table>
-    </v-row>
+    <template v-if="data.filter((signup) => !signup.to_do).length > 0">
+      <v-row justify="center" class="my-5">
+        <h2>Done</h2>
+      </v-row>
+      <v-row justify="center">
+        <v-table>
+          <thead>
+            <tr>
+              <th class="text-left">Name</th>
+              <th class="text-left">Time</th>
+              <th class="text-left">Title</th>
+              <th class="text-left">Artist</th>
+              <th class="text-left">Un-Dismiss</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="signup in data.filter((signup) => !signup.to_do)"
+              :key="signup.created_at"
+            >
+              <td>{{ signup.name }}</td>
+              <td>{{ relativeTime(signup.created_at) }}</td>
+              <td>{{ signup.song.title }}</td>
+              <td>{{ signup.song.artist }}</td>
+              <td>
+                <v-btn color="blue" @click="updateToDo(signup.id, true)"
+                  >Un-Dismiss</v-btn
+                >
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+      </v-row>
+    </template>
   </v-container>
 </template>
