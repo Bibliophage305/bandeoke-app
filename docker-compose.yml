@@ -1,61 +1,43 @@
 version: "3.8"
 services:
   postgres:
-    image: postgres:14.1-alpine
+    image: postgres:15
     restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - '5432:5432'
-    volumes: 
-      - bandeoke-postgres:/var/lib/postgresql/data
-  
-  postgres-setup:
-    image: postgres:14.1-alpine
-    restart: no
-    depends_on:
-      - postgres
-    entrypoint: [ "bash", "-c", "sleep 10 && /home/database/migrate_and_seed.sh"]
-    volumes: 
-      - bandeoke-postgres:/var/lib/postgresql/data
-      - ./database:/home/database
 
-  nuxt:
+    environment:
+      PGPASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      POSTGRES_DB: "${POSTGRES_DATABASE:-postgres}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes: 
+      - postgres:/var/lib/postgresql/data
+      - ./database:/home/database
+  
+  nuxt-app:
     depends_on:
       - postgres
-      - postgres-setup
     links:
       - postgres
+    user: "${UID:-1000}:${GID:-1000}"
     build:
-      context: .
-      dockerfile: dockerfile.dev
-    restart: always
+      context: "${DOCKERFILE_DIRECTORY}"
+      dockerfile: Dockerfile
+    tty: true
     ports:
-      - "5173:5173"
+      - "3000:3000"
       - "24678:24678"
-    volumes:
-      - ./public:/home/node/app/public
-      - ./database:/home/node/app/database
-      - ./middleware:/home/node/app/middleware
-      - ./server:/home/node/app/server
-      - ./plugins:/home/node/app/plugins
-      - ./static:/home/node/app/static
-      - ./pages:/home/node/app/pages
-      - ./layouts:/home/node/app/layouts
-      - ./nuxt.config.ts:/home/node/app/nuxt.config.ts
-      - ./tsconfig.json:/home/node/app/tsconfig.json
-    command: >
-      sh -c "yarn dev --host 0.0.0.0"
     environment:
-      - PORT=5173
-      - PASSWORD=password
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=postgres
+      PGPASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      POSTGRES_DB: "${POSTGRES_DATABASE:-postgres}"
+      POSTGRES_HOST: "postgres"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      POSTGRES_POST: "${POSTGRES_PORT:-5432}"
+    volumes:
+      - .:/src
 
 volumes:
-  bandeoke-postgres:
+  postgres:
     driver: local

@@ -1,8 +1,15 @@
 #!/bin/bash
 
+# npx nuxi-docker postgres /home/database/migrate_and_seed.sh
+
+# Move to directory of the script
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+cd "$parent_path"
+
 # Define the directories
-migration_dir="/home/database/migrations"
-seeding_dir="/home/database/seeding"
+migration_dir="migrations"
+seeding_dir="seeding"
+
 
 # Function to execute SQL files
 execute_sql_files() {
