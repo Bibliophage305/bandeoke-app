@@ -13,17 +13,18 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes: 
       - postgres:/var/lib/postgresql/data
-      - ./database:/home/database
   
   nuxt-app:
     depends_on:
       - postgres
     links:
       - postgres
-    user: "${UID:-1000}:${GID:-1000}"
+    user: "${DOCKER_USER_UID}:${DOCKER_USER_GID}"
     build:
       context: "${DOCKERFILE_DIRECTORY}"
-      dockerfile: Dockerfile
+      args:
+        - DOCKER_USER_UID=${DOCKER_USER_UID}
+        - DOCKER_USER_GID=${DOCKER_USER_GID}
     tty: true
     ports:
       - "3000:3000"
@@ -36,7 +37,7 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
       POSTGRES_POST: "${POSTGRES_PORT:-5432}"
     volumes:
-      - .:/src
+      - .:/home/node/src
 
 volumes:
   postgres:
